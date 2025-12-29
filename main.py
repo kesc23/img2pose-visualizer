@@ -27,6 +27,7 @@ def _load_model():
     img2pose_model.evaluate()
     return img2pose_model
 
+
 def _img2pose_rvec_to_pyr_deg(rvec_xyz) -> "tuple[float, float, float]":
         """
         rvec_xyz: (3,) Rodrigues/rotvec from img2pose
@@ -38,6 +39,7 @@ def _img2pose_rvec_to_pyr_deg(rvec_xyz) -> "tuple[float, float, float]":
         yaw   = -e[1]
         roll  = -e[2]
         return pitch, yaw, roll
+
 
 def retrieve_face_angles(model, image: "np.ndarray", threshold: "float" = 0.9) -> "list[tuple[float, float, float]]":
     """Retrieve face angles and bounding boxes from an image using img2pose model."""
@@ -60,6 +62,7 @@ def retrieve_face_angles(model, image: "np.ndarray", threshold: "float" = 0.9) -
 
     return angles, bboxes
 
+
 def print_angles(image: "np.ndarray", angles: "list[tuple[float, float, float]]", bboxes: "list[np.ndarray]"):
     for i, bbox in enumerate(bboxes):
         x1, y1, x2, y2 = bbox.astype("int")
@@ -69,3 +72,37 @@ def print_angles(image: "np.ndarray", angles: "list[tuple[float, float, float]]"
         cv2.putText(image, f"Pitch: {angles[i][0]:.1f}", (x1, y1 - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
         cv2.putText(image, f"Yaw: {angles[i][1]:.1f}", (x1, y1 - 20),   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
         cv2.putText(image, f"Roll: {angles[i][2]:.1f}", (x1, y1),       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+
+if __name__ == '__main__':
+    import sys
+    import cv2
+    import numpy as np
+    from torchvision.transforms import transforms
+    from scipy.spatial.transform import Rotation as R
+
+    sys.path.append("./img2pose")
+
+    transform = transforms.Compose([transforms.ToTensor()])
+    model = _load_model()
+
+    try:
+        cap = cv2.VideoCapture(0)
+
+        while cap.isOpened():
+            ret, frame = cap.read()
+
+            if not ret:
+                break
+
+            print_angles(frame, *retrieve_face_angles(model, frame))
+
+            cv2.imshow("Test Window", frame)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    except KeyboardInterrupt:
+        pass
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
