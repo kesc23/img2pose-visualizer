@@ -59,3 +59,13 @@ def retrieve_face_angles(model, image: "np.ndarray", threshold: "float" = 0.9) -
             bboxes.append(all_bboxes[i])
 
     return angles, bboxes
+
+def print_angles(image: "np.ndarray", angles: "list[tuple[float, float, float]]", bboxes: "list[np.ndarray]"):
+    for i, bbox in enumerate(bboxes):
+        x1, y1, x2, y2 = bbox.astype("int")
+        cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+        #draw text for angles pitch, yaw, roll
+        cv2.putText(image, f"Pitch: {angles[i][0]:.1f}", (x1, y1 - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+        cv2.putText(image, f"Yaw: {angles[i][1]:.1f}", (x1, y1 - 20),   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+        cv2.putText(image, f"Roll: {angles[i][2]:.1f}", (x1, y1),       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
