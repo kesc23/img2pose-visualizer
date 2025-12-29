@@ -28,7 +28,7 @@ poetry install
 
 ### Img2pose Installation
 
-For model instalation (in folder `/models`) you should proceed to the [original im2pose repo and recommendations](https://github.com/vitoralbiero/img2pose).
+For model instalation (in folder `/models`) you should proceed to the [original im2pose repo and recommendations](https://github.com/vitoralbiero/img2pose?tab=readme-ov-file#testing).
 
 
 ## Run
