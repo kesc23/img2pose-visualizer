@@ -27,3 +27,35 @@ def _load_model():
     img2pose_model.evaluate()
     return img2pose_model
 
+def _img2pose_rvec_to_pyr_deg(rvec_xyz) -> "tuple[float, float, float]":
+        """
+        rvec_xyz: (3,) Rodrigues/rotvec from img2pose
+        returns: (pitch, yaw, roll) in degrees (AFLW-style)
+        """
+        Rm = R.from_rotvec(rvec_xyz).as_matrix()
+        e = R.from_matrix(Rm.T).as_euler("xyz", degrees=True)  # x,y,z
+        pitch = e[0]
+        yaw   = -e[1]
+        roll  = -e[2]
+        return pitch, yaw, roll
+
+def retrieve_face_angles(model, image: "np.ndarray", threshold: "float" = 0.9) -> "list[tuple[float, float, float]]":
+    """Retrieve face angles and bounding boxes from an image using img2pose model."""
+
+    res = model.predict([transform(image)])[0]
+
+    all_bboxes = res["boxes"].cpu().numpy().astype("float")
+
+    angles = []
+    bboxes = []
+
+    dofs = res["dofs"].cpu().numpy()
+
+    for i in range(len(all_bboxes)):
+        if res["scores"][i] > threshold:
+            pose_pred = dofs[i].astype("float")
+            pose_pred = pose_pred.squeeze()
+            angles.append(_img2pose_rvec_to_pyr_deg(pose_pred[:3]))
+            bboxes.append(all_bboxes[i])
+
+    return angles, bboxes
