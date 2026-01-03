@@ -95,6 +95,8 @@ if __name__ == '__main__':
             if not ret:
                 break
 
+            frame = cv2.resize(frame, (1280, 720))
+
             print_angles(frame, *retrieve_face_angles(model, frame))
 
             cv2.imshow("Test Window", frame)
