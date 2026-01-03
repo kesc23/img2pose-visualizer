@@ -39,6 +39,10 @@ Just run in your terminal
 python main.py
 ```
 
+<img src="./assets/img2pose-kevin-kesc23-teste.gif" alt="Kesc23 img2pose test" width="500">
+
+As you can see, the a box with stats including yaw, roll and pitch angles appear whenever a face is detected.
+
 And this should be everything.
 
 ## Other info
